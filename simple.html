@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script> <!-- 最新版のjQuery CDN -->
+    <title>Gemini ChatBot</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
+    <link rel="stylesheet" href="./simple.css"> <!-- 外部CSSファイルへのリンク -->
+</head>
+<body>
+    <!-- チャット表示アイコン -->
+    <div class="chat-icon" id="chat-icon">
+        <img src="./comment.png" alt="Chat Icon">
+    </div>
+
+    <!-- チャットUI -->
+    <div class="chat-box" id="chat-box">
+        <h3>AIに相談する</h3>
+        <div class="chat-output" id="chat-output"></div>
+        <div class="text-btn">
+            <input type="text" class="chat-input" id="user-input" placeholder="チャットで相談する">
+            <button class="send-btn" id="send-btn">
+                <img src="kamihikouki_transparent.png" width="25px">
+            </button>
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+          "imports": {
+            "@google/generative-ai": "https://esm.run/@google/generative-ai"
+          }
+        }
+    </script>
+
+    <script type="module">
+        import { GoogleGenerativeAI } from "@google/generative-ai";
+
+        // APIキーを安全に管理
+        const API_KEY = AIzaSyBBqqOxGkRkL1E-D67GDIFpmWRyKbPH7_8; // APIキーを環境変数で管理することを推奨
+        if (!API_KEY) {
+            console.error("APIキーが設定されていません。環境変数で設定してください。");
+        }
+
+        const genAI = new GoogleGenerativeAI(API_KEY);
+
+        // モデルをロードする関数
+        async function loadModel() {
+            try {
+                console.log("モデルを読み込み中...");
+                const model = await genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                console.log("モデルが正常に読み込まれました。");
+                return model;
+            } catch (error) {
+                console.error("モデルの読み込みエラー:", error);
+                alert("モデルの読み込みに失敗しました。APIキーや接続を確認してください。");
+                throw error;
+            }
+        }
+
+        // チャットを開始する関数
+        async function startChat(model) {
+            try {
+                console.log("チャットセッションを開始中...");
+                const chat = await model.startChat({
+                    messages: [
+                        { role: "user", content: "こんにちは、家に犬が2匹います。" },
+                        { role: "model", content: "こんにちは！何について知りたいですか？" }
+                    ],
+                    generationConfig: { maxOutputTokens: 100 }
+                });
+                console.log("チャットセッションが開始されました:", chat);
+                return chat;
+            } catch (error) {
+                console.error("チャットセッションエラー:", error);
+                throw error;
+            }
+        }
+
+        // メッセージを送信する関数
+        async function sendMessage(chat, msg) {
+            try {
+                console.log("メッセージ送信中:", msg);
+                const result = await chat.sendMessage({ content: msg });
+                const response = result.generations[0].text;
+                console.log("レスポンスを受信しました:", response);
+                return response;
+            } catch (error) {
+                console.error("メッセージ送信エラー:", error);
+                throw error;
+            }
+        }
+
+        $(document).ready(function () {
+            $('#send-btn').on('click', async function () {
+                const userInput = $('#user-input').val();
+                if (userInput) {
+                    $('#chat-output').append(`<div class="out-text"><div class="ans-text right">${userInput}</div></div>`);
+                    $('#user-input').val('');
+
+                    try {
+                        const model = await loadModel();
+                        const chat = await startChat(model);
+                        const response = await sendMessage(chat, userInput);
+                        $('#chat-output').append(`<div class="out-text"><img class="hito-icon" src="hito-icon.png"><div class="ans-text left">${response}</div></div>`);
+                        $('#chat-output').scrollTop($('#chat-output')[0].scrollHeight);
+                    } catch (error) {
+                        console.error("チャットプロセスエラー:", error);
+                    }
+                }
+            });
+
+            $('#chat-icon').on('click', function () {
+                $('#chat-box').toggle();
+            });
+        });
+    </script>
+</body>
+</html>

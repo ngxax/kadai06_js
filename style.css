@@ -1,0 +1,130 @@
+
+body { 
+    font-family: Arial, sans-serif; 
+}
+.chat-box {
+    width: 300px;
+    margin: auto;
+    border: 1px solid #febd78;
+    background-color: #fff8da;
+    padding: 20px;
+    border-radius:10px;
+ }
+
+ /* 会話の表示 */
+.chat-output {
+    display: grid;
+    gap: 1em 0;
+    padding: 30px 15px;
+    margin-bottom: 20px;
+    background-color: #fff8da;
+    height: 400px;
+    overflow-y:auto; 
+}
+/* チャットで相談するのスタイル */
+.chat-input {
+    width: calc(100% - 50px);
+    padding: 10px; 
+    border: 1px solid #ccc;
+    border-radius: 50px;
+}
+/* 送信ボタンのスタイル */
+.send-btn { 
+    padding: 10px;
+    background-color: #febd78;
+    border: none;
+    cursor: pointer;
+    border-radius: 50px;
+    margin-left: 10px; /* 余白の調整 */
+}
+.text-btn{
+    display: flex;
+}
+
+/* トーク全体のスタイル */
+
+.out-text{
+    display: flex;
+    align-items: center;
+    gap: 0 15px;
+}
+
+/* 表示メッセージの基本 */
+.ans-text{
+    display: inline-block;
+    position: relative;
+    max-width: 75%;
+    margin: 0;
+    padding: .4em .8em;
+    border-radius: 20px;
+    color: #333;
+    font-size: .9em;
+}
+.ans-text::before {
+    position: absolute;
+    top: -15px;
+    width: 20px;
+    height: 30px;
+    content: '';
+}
+
+/* ユーザーメッセージのスタイル */
+.ans-text.rigtht {
+    background-color: #30e852;
+    margin: 0 10px 0 auto;
+}
+.ans-text.rigtht::before {
+    right: -10px;
+    border-radius: 0 0 15px 0;
+    box-shadow: 3px -15px 0 -7px #30e852 inset;
+}
+
+/* AIメッセージのスタイル */
+.ans-text.left {
+    background-color: #fff;
+    margin-left: 30px;
+}
+
+.ans-text.left::before {
+    left: -10px;
+    border-radius: 0 0 0 15px;
+    box-shadow: -3px -15px 0 -7px white inset;
+}
+/* AIアイコン */
+.hito-icon{
+    width: 2.5em;
+    height: 2.5em;
+    border-radius: 50%;
+}
+
+
+
+
+
+/* usernameクラスのスタイル */
+.username {
+    border-radius: 4px;
+    display: inline-block;
+    font-weight: bold;
+    color: #000000;
+    font-size: 12px;
+    padding: 3px;
+}
+
+/* アイコン画像のスタイル */
+.user-icon {
+    display: inline-block;
+    vertical-align: middle;  /* テキストとアイコンを縦位置で中央揃え */
+    margin-left: 10px; /* 余白の調整 */
+}
+
+
+#text:focus {
+    border-color: #66afe9;
+    box-shadow: 0 0 8px rgba(102, 175, 233, 0.8);
+}
+
+.name{
+    font-weight: bold;
+    font-size: 12px;
+}

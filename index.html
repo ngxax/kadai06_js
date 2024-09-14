@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Gemini ChatBot</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<!-- チャットUI  -->
+  <body>
+    <div class="chat-box">
+      <h3>AIに相談する</h3>
+      <div class="chat-output" id="chat-output"></div>
+      <div class="text-btn">
+        <input type="text" class="chat-input" id="user-input" placeholder="チャットで相談する">
+      <button class="send-btn" id="send-btn"><img src="kamihikouki_transparent.png" width="25px"></button>
+    </div>
+  </div>
+
+
+    <!-- ... Your HTML and CSS -->
+
+    <script type="importmap">
+        
+        {
+          "imports": {
+            "@google/generative-ai": "https://esm.run/@google/generative-ai"
+          }
+        }
+      </script>
+      <script type="module">
+        import { GoogleGenerativeAI } from "@google/generative-ai";
+      
+        // Fetch your API_KEY
+        const API_KEY = "";
+        console.log("API_KEY:", API_KEY);  // APIキーの確認
+
+        // Access your API key (see "Set up your API key" above)
+        const genAI = new GoogleGenerativeAI(API_KEY);
+        console.log("genAI instance created:", genAI);  // インスタンスが作成されたか確認
+        
+// モデルをロードする関数
+async function loadModel() {
+    try {
+        console.log("Loading model...");
+        const model = await genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        console.log("Model loaded successfully:", model);
+        return model;
+    } catch (error) {
+        console.error("Error loading model:", error);
+        throw error;
+    }
+}
+
+// チャットを開始する関数
+async function startChat(model) {
+    try {
+        console.log("Starting chat session...");
+        const chat = model.startChat({
+            messages: [
+                { role: "user", content: "Hello, I have 2 dogs in my house." },
+                { role: "model", content: "Great to meet you. What would you like to know?" }
+            ],
+            generationConfig: { maxOutputTokens: 100 }
+        });
+        console.log("Chat session started:", chat);
+        return chat;
+    } catch (error) {
+        console.error("Error during chat session:", error);
+        throw error;
+    }
+}
+
+// メッセージを送信する関数
+async function sendMessage(chat, msg) {
+    try {
+        console.log("Sending message:", msg);
+        const result = await chat.sendMessage(msg);
+        const response = await result.response;
+        const text = await response.text();
+        console.log("Response received:", text);
+        return text;
+    } catch (error) {
+        console.error("Error sending message:", error);
+        throw error;
+    }
+}
+
+// ボタンを押した時のイベント
+$('#send-btn').click(async () => {
+    console.log("Send button clicked");
+    const userInput = $('#user-input').val();
+    console.log("User input:", userInput);
+
+    if (userInput) {
+        $('#chat-output').append(`<div class="out-text"><div class="ans-text rigtht"><strong></strong> ${userInput}</div></div>`);
+        $('#user-input').val('');
+        console.log("User input field cleared");
+
+        try {
+            const model = await loadModel();
+            const chat = await startChat(model);
+            const response = await sendMessage(chat, userInput);
+            $('#chat-output').append(`<div src="out-text"><img class="hito-icon" src="hito-icon.png"><div class="ans-text left"><strong></strong> ${response}</div></div>`);
+            $('#chat-output').scrollTop($('#chat-output')[0].scrollHeight);
+            console.log("Chat output scrolled to bottom");
+        } catch (error) {
+            console.error("Error in chat process:", error);
+        }
+    }
+});
+
+
+      
+      </script>
+      
+  <!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+
+</body></html>
+
